@@ -125,4 +125,82 @@ for freq in freqs:
     final_df.to_csv(cleaned_path / f"{freq}.csv", index=False)
     print(f"Saved: {cleaned_path/f'{freq}.csv'}")
 
+
+#%%
+
+
+# 1. Base folder 
+BASE_DIR = Path("C:/Users/leona/Desktop/Masters/Data Mungin/Second group Project/datasets")
+
+
+regions = {
+    "US-FLA-FPL": "FL",
+    "US-CAL-CISO": "CA",
+    "US-NY-NYIS": "NY",
+}
+
+frequencies = ["hourly", "daily", "monthly", "yearly"]
+
+
+rename_map = {
+    "Datetime (UTC)": "datetime_utc",
+    "Country": "country",
+    "Zone name": "zone_name",
+    "Zone id": "zone_id",
+    "Carbon intensity gCO₂eq/kWh (direct)": "carbon_intensity_direct",
+    "Carbon intensity gCO₂eq/kWh (Life cycle)": "carbon_intensity_lifecycle",
+    "Carbon-free energy percentage (CFE%)": "cfe_pct",
+    "Renewable energy percentage (RE%)": "re_pct",
+    "Data source": "data_source",
+    "Data estimated": "data_estimated",
+    "Data estimation method": "data_estimation_method",
+}
+
+
+output_dir = BASE_DIR / "big"
+output_dir.mkdir(exist_ok=True)
+
+big_dfs = {}
+
+for freq in frequencies:
+    frames = []
+    for region_id, folder in regions.items():
+        file_path = BASE_DIR / folder / "cleaned" / f"{freq}.csv"
+        print(f"Reading: {file_path}")
+        df = pd.read_csv(file_path)
+
+        
+        df = df.rename(columns=rename_map)
+
+
+        if "region" not in df.columns:
+            df["region"] = region_id
+
+        
+        if "frequency" not in df.columns:
+            df["frequency"] = freq
+
+    
+        if "year" not in df.columns:
+        
+            df["year"] = pd.to_datetime(df["datetime_utc"]).dt.year
+
+        frames.append(df)
+
+
+    big_df = pd.concat(frames, ignore_index=True)
+
+
+    out_path = output_dir / f"big_{freq}.parquet"
+    big_df.to_parquet(out_path, index=False)
+    print(f"Saved: {out_path}")
+
+    big_dfs[freq] = big_df
+
+print("Done")
+
+#%%
+import pandas as pd
+daily = pd.read_parquet('C:/Users/leona/Desktop/Masters/Data Mungin/Second group Project/datasets/big/big_daily.parquet')
+daily.head
 #%%
