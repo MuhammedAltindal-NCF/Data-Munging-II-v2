@@ -204,3 +204,9 @@ import pandas as pd
 daily = pd.read_parquet('C:/Users/leona/Desktop/Masters/Data Mungin/Second group Project/datasets/big/big_daily.parquet')
 daily.head
 #%%
+
+import pandas as pd
+
+df = pd.read_csv("/Users/muhammedaltindal/Data-Munging-II-v2-2/weather_2021-01-01_2021-03-31.csv")
+df
+# %%
