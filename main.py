@@ -210,3 +210,36 @@ import pandas as pd
 df = pd.read_csv("/Users/muhammedaltindal/Data-Munging-II-v2-2/weather_2021-01-01_2021-03-31.csv")
 df
 # %%
+import pandas as pd
+df = pd.read_parquet("fl_2022.parquet")
+df.head(), df.tail(), df.shape
+
+#%%
+import pandas as pd
+
+df = pd.read_parquet("weather_daily.parquet")
+
+# drop the bad helper column
+if "0" in df.columns:
+    df = df.drop(columns=["0"])
+
+# drop the broken first row (where date is NaN)
+df = df.dropna(subset=["date"])
+
+df.to_parquet("weather_daily.parquet", index=False)
+print(df.head(), df.tail(), df.shape)
+
+#%%
+import pandas as pd
+
+# Carregar os três arquivos Parquet
+df1 = pd.read_parquet('C:/Users/leona/Desktop/Masters/Data Mungin/Second group Project/jan_oct_2022.parquet')
+df2 = pd.read_parquet('C:/Users/leona/Desktop/Masters/Data Mungin/Second group Project/weather_daily.parquet')
+# df3 = pd.read_parquet('C:/Users/leona/Desktop/Masters/Data Mungin/Second group Project/dec_2021.parquet')
+
+# Concatenar os DataFrames
+df_completo = pd.concat([df1, df2], ignore_index=True)
+
+# Opcional: salvar o resultado em um novo arquivo Parquet
+df_completo.to_parquet('fl_2022.parquet')
+#%%

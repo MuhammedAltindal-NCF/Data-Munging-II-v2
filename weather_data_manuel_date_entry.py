@@ -5,7 +5,7 @@ import requests
 import pandas as pd
 from dotenv import load_dotenv
 
-# 3 şehrimiz:
+# List of cities we want to query:
 CITIES = ["Los Angeles", "New York", "Tampa"]
 
 def configure():
@@ -13,16 +13,17 @@ def configure():
 
 def get_weather_for_day(session, city_name, day):
     """
-    Belirli bir gün ve şehir için hava durumu çağrısı.
-    Buradaki URL'yi senin kullandığın endpoint'e göre ayarla.
-    Şu an örnek olsun diye OpenWeather URL'si var.
+    Weather API call for a specific city and day.
+    Adjust this URL according to the endpoint you are actually using.
+    Right now this is using a standard OpenWeather endpoint as an example.
+    If you are using the "historical" endpoint, you may need to add parameters like &dt=...
     """
     api_key = os.getenv("weather_api_key")
     if not api_key:
-        raise RuntimeError("weather_api_key .env dosyasında bulunamadı.")
+        raise RuntimeError("weather_api_key not found in the .env file.")
 
-    # TODO: Eğer history endpoint kullanıyorsan &dt=... vs eklemen gerekebilir.
-    # Şimdilik senin ekran görüntündeki URL'yi baz alıyorum:
+    # TODO: If using a historical endpoint, modify according to your URL requirements.
+    # For now, this is based on the URL shown in your screenshot:
     url = (
         f"https://api.openweathermap.org/data/2.5/weather"
         f"?q={city_name}&units=imperial&appid={api_key}"
@@ -37,14 +38,18 @@ def main():
     s = requests.Session()
 
     # ==============================
-    # 1) BURAYI HER SEFERİNDE MANUEL DEĞİŞTİRECEKSİN
-    # Günlük kota hesabı (3 şehir için):
-    # 1000 toplam - 100 güvenlik = 900 çağrı
-    # 900 / 3 = 300 güne kadar güvenli
+    # 1) UPDATE THESE DATES MANUALLY WHENEVER YOU NEED
     #
-    # ÖRNEK: 01-01-2021 ile 28-10-2021 arası 300 gün gibi bir aralık seç.
-    start_date = date(2021, 1, 1)   # BAŞLANGIÇ TARİHİ
-    end_date   = date(2021, 3, 31)  # BİTİŞ TARİHİ (en fazla 300 gün olsun)
+    # Daily quota calculation (for 3 cities):
+    # 1000 total requests - 100 safety buffer = 900 usable requests
+    # 900 / 3 cities = 300 safe days
+    #
+    # EXAMPLE: Choose a range such as 2021-01-01 to 2021-10-28 (around 300 days).
+    #
+    # IMPORTANT: Keep the range below 300 days unless you reduce the number of cities.
+    # ==============================
+    start_date = date(2021, 1, 1)   # START DATE
+    end_date   = date(2021, 3, 31)  # END DATE (keep within ~300 days)
     # ==============================
 
     rows = []
@@ -61,18 +66,19 @@ def main():
                 "feels_like": data["main"]["feels_like"],
                 "humidity": data["main"]["humidity"],
                 "wind_speed": data["wind"]["speed"],
-                "timestamp": data.get("dt"),
+                "timestamp": data.get("dt"),  # UNIX timestamp returned by API
             })
 
         current += timedelta(days=1)
 
     df = pd.DataFrame(rows)
 
-    # Dosya adını da tarih aralığına göre verelim:
+    # Save file with date range included in the name:
     filename = f"weather_{start_date}_{end_date}.csv"
     df.to_csv(filename, index=False)
-    print(f"Kaydedildi → {filename}")
-    print(f"Toplam API çağrısı: {len(rows)}")
+
+    print(f"Saved → {filename}")
+    print(f"Total API calls: {len(rows)}")
 
 if __name__ == "__main__":
     main()
