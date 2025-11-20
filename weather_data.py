@@ -126,18 +126,18 @@ def append_to_parquet(rows, output_path: str):
 
 
 def main():
-    start = date(2023, 1, 1)
-    end = date(2023, 12, 31)
+    start = date(2024, 1, 1)
+    end = date(2024, 12, 31)
 
     test_regions = {
-        "US-FLA-FPL": REGIONS["US-FLA-FPL"],
+        "US-CAL-CISO" : REGIONS["US-CAL-CISO"],
     }
 
     rows = fetch_weather_range(
         start_date=start,
         end_date=end,
         regions=test_regions,
-        max_calls=366,
+        max_calls=800,
     )
 
     append_to_parquet(rows, OUTPUT_PARQUET)
