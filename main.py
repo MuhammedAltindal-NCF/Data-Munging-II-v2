@@ -201,7 +201,7 @@ print("Done")
 
 #%%
 import pandas as pd
-daily = pd.read_parquet('C:/Users/leona/Desktop/Masters/Data Mungin/Second group Project/datasets/big/big_daily.parquet')
+daily = pd.read_parquet('C:/Users/leona/Desktop/Masters/Data Mungin/Second group Project/datasets/big/big_monthly.parquet')
 daily.head
 #%%
 
@@ -211,7 +211,7 @@ df = pd.read_csv("/Users/muhammedaltindal/Data-Munging-II-v2-2/weather_2021-01-0
 df
 # %%
 import pandas as pd
-df = pd.read_parquet("fl_2022.parquet")
+df = pd.read_parquet("datasets\big\big_daily.parquet")
 df.head(), df.tail(), df.shape
 
 #%%
@@ -225,8 +225,9 @@ if "0" in df.columns:
 
 # drop the broken first row (where date is NaN)
 df = df.dropna(subset=["date"])
-
-df.to_parquet("weather_daily.parquet", index=False)
+#%%
+import pandas as pd
+df = pd.read_parquet("cal_2021.parquet")
 print(df.head(), df.tail(), df.shape)
 
 #%%
@@ -242,4 +243,22 @@ df_completo = pd.concat([df1, df2], ignore_index=True)
 
 # Opcional: salvar o resultado em um novo arquivo Parquet
 df_completo.to_parquet('fl_2022.parquet')
+#%%
+df_provider = pd.read_excel(
+    "C:\\Users\\leona\\Desktop\\Masters\\Data Mungin\\Second group Project\\EDS\\by_sector_by_provider.xlsx"
+)
+print(df_provider.head(), df_provider.tail(), df_provider.shape)
+#%%
+import pandas as pd
+
+path = r"C:\Users\leona\Desktop\Masters\Data Mungin\Second group Project\EDS\by_sector_by_provider.xlsx"
+
+# Usa a segunda linha como cabeçalho (índice 1)
+df_provider = pd.read_excel(path, header=1, skiprows=1)
+
+
+print(df_provider.head(), df_provider.tail(), df_provider.shape)
+
+
+
 #%%
